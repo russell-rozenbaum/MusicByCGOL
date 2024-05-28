@@ -1,10 +1,11 @@
 
 //create a synth and connect it to the main output (your speakers)
-const limiter = new Tone.Limiter(-12).toDestination();
 const synth = new Tone.PolySynth(Tone.Synth);
-synth.connect(limiter);
-limiter.toDestination();
-const now = Tone.now();
+const filter = new Tone.Filter(2000, "lowpass");
+synth.connect(filter);
+const comp = new Tone.Compressor(-48, 3).toDestination();
+synth.connect(comp);
+
 
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
@@ -17,11 +18,9 @@ window.addEventListener('resize', function() {
     canvas.height = window.innerHeight;
 });
 
-let clock = 0;
-let clockPer = 5;
 const xLoc = 0;
 const yLoc = 0;
-const gridSize = 16;
+const gridSize = 12;
 const cellSize = 38;
 let grid = [];
 let audioToPlay = [];
@@ -77,18 +76,14 @@ function fillGrid() {
 fillGrid();
 
 function handleCells() {
-    if (clock > clockPer) {
-        updateMethod();
-        clock = 0;
-    }
-    else clock++;
+    synth.triggerRelease(audioToPlay, Tone.now());
+    updateMethod();
     for (let i = 0; i < grid.length; i++) {
         grid[i].draw();
     }
 }
 
 function updateMethod() {
-    synth.triggerRelease(audioToPlay, now);
     audioToPlay = [];
     let newGrid = [];
     for (let i = 0; i < grid.length; i++) {
@@ -150,8 +145,7 @@ function updateMethod() {
             }
         }
     }
-    setTimeout(() => {
-        synth.triggerAttack(audioToPlay, now);}, 50);
+    synth.triggerAttack(audioToPlay, Tone.now());
 }
 
 function animate() {
@@ -161,7 +155,8 @@ function animate() {
     ctx.fillStyle = 'black';
     ctx.fillRect(xLoc,yLoc, gridSize * cellSize, gridSize * cellSize);
     handleCells();
-    requestAnimationFrame(animate);
+    setTimeout(() => {
+        requestAnimationFrame(animate);}, 1000);
 }
 
 window.addEventListener('keydown', async(event) => {
@@ -171,7 +166,7 @@ window.addEventListener('keydown', async(event) => {
             await Tone.start();
             console.log('Audio is ready');
             setTimeout(() => {
-                animate();}, 1000);
+                animate();}, 500);
           } catch (error) {
             console.error('Failed to initialize audio:', error);
           }
