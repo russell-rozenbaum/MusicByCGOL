@@ -1,7 +1,7 @@
 
 //create a synth and connect it to the main output (your speakers)
 const synth = new Tone.PolySynth(Tone.Synth);
-const filter = new Tone.Filter(2000, "lowpass");
+const filter = new Tone.Filter(10000, "lowpass");
 synth.connect(filter);
 const comp = new Tone.Compressor(-48, 3).toDestination();
 synth.connect(comp);
