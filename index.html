@@ -8,7 +8,24 @@
     <script src="http://unpkg.com/tone"></script>
 </head>
 <body>
-    <canvas id="canvas1"></canvas>
+    <main>
+        <nav>
+            <ul class="title"> 
+                <a href="#" onclick="window.location.reload();">
+                    Music by Conway's Game of Life
+                </a>
+            </ul>
+        </nav>
+        <div class="items">
+            <div class="inputBox"> 
+                <label for="sliderInput">Scale <span id="sliderValue"></span></label>
+                <input type="range" id="sliderInput" min="1" max="81" value="67">
+            </div>    
+            <canvas id="canvas1"></canvas>
+        </div>
+
+    </main>
+   
     <script src="main.js"></script>
 </body>
 

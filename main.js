@@ -1,10 +1,11 @@
 
 //create a synth and connect it to the main output (your speakers)
-const synth = new Tone.PolySynth(Tone.Synth);
-const filter = new Tone.Filter(10000, "lowpass");
-synth.connect(filter);
-const comp = new Tone.Compressor(-48, 3).toDestination();
-synth.connect(comp);
+const synth = new Tone.PolySynth();
+synth.set({ detune: -1200 });
+const filter = new Tone.Filter(24200, "lowpass");
+const reverb = new Tone.Reverb(.1);
+const comp = new Tone.Compressor(-30, 3).toDestination();
+synth.chain(filter, reverb, comp);
 
 
 const canvas = document.getElementById('canvas1');
@@ -52,6 +53,8 @@ class Cell {
 }
 
 const wholeScale = [2, 2, 1, 2, 2, 2, 1];
+const altScale = [2, 2, 1, 2, 2, 3];
+const altInts = [4, 3, 5, 4, 3, 5];
 const diatonicThirds = [4, 3, 4, 3, 3, 4, 3];
 // C-Major Scale
 // To-do: Allow changing of root in UI

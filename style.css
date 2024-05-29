@@ -1,6 +1,86 @@
-#canvas1 {
-    background: rgb(255, 255, 255);
-    width: 100vh;
+body {
+    /* The main font used on the website */
+    font-family: Optima, sans-serif;
+    /* The main color used on the website */
+    background-color: rgb(200, 222, 232);;
+}
+
+/* Main with main image */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-size: cover;
+}
+
+ul {
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+}
+
+/* Layout for links in navbar */
+nav a {
+  color: #8e8f92;
+  display: block;
+  text-decoration: none;
+}
+  
+/* Animation for hovering over link in nav bar */
+nav a:hover {
+  color: rgb(122, 147, 178);
+  transition: color .3s ease-in-out;
+}
+
+/* Navbar main layout */
+.title {
+    left: 0px;
+    top: 0px;
+    font-size: 32px;
+    display: flex;
+    position: fixed;
+    z-index: 3;
+}
+
+.items {
+    display: grid;
+    width: 85vw;
     height: 100vh;
+    grid-template-columns: 2fr;
+    grid-template-rows: 1fr;
+    grid-gap: 100px;
+    margin-top: 200px;
+}
+
+#canvas1 {
+    background: rgb(237, 237, 237);
+    width: 300px;
+    height: 300px;
+    grid-column: 2;
+}
+
+.inputBox {
+    width: 250px; 
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 3fr;
+    background: rgb(235, 235, 235);
+    padding: 20px;
+    align-self: self-start;
+    grid-column: 1;
+}
+
+#sliderInput {
+    width: 200px; 
+    margin-bottom: 20px;
+  }
+
+#survivalLBInput {
+    width: 200px; 
+    margin-bottom: 20px;
 }
 
