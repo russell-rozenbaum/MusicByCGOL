@@ -77,7 +77,7 @@ const altInts = [4, 3, 5, 4, 3, 5];
 */
 let scaleIdx = 0;
 // We base at G1 or 48.999 Hz
-const scaleRoot = 48.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
+const scaleRoot = 97.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
 function getNoteName(freq) {
     const scale = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let basePlusInterval = Math.log2(freq / scaleRoot) * 12;
@@ -235,6 +235,7 @@ function handleMouseClick(event) {
             grid[i].alive = !grid[i].alive;
             grid[i].draw();
         }
+        grid[i].playing = false;
     }
     findRightMost();
 }
