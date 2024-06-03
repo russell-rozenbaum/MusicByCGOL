@@ -231,7 +231,6 @@ function handleMouseClick(event) {
     const cellIndex = row * gridSize + col;
 
     for (let i = 0; i < grid.length; i++) {
-        console.log(i === cellIndex);
         if (i === cellIndex) {
             grid[i].alive = !grid[i].alive;
             grid[i].draw();
@@ -240,3 +239,5 @@ function handleMouseClick(event) {
     findRightMost();
 }
 canvas.addEventListener('click', handleMouseClick);
+
+
