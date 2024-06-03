@@ -11,21 +11,23 @@ synth.chain(filter, reverb, comp);
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 
-canvas.width = window.innerHeight;
-canvas.height = window.innerHeight;
+canvas.width = 504;
+canvas.height = 504;
 
+/*
 window.addEventListener('resize', function() {
-    canvas.width = window.innerHeight;
+    canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
+*/
 
+let paused = true;
 const xLoc = 0;
 const yLoc = 0;
 const gridSize = 12;
-const cellSize = 38;
+const cellSize = 42;
 let grid = [];
 let audioToPlay = [];
-
 
 class Cell {
     constructor(x, y, alive, note) {
@@ -33,33 +35,56 @@ class Cell {
         this.y = y;
         this.alive = alive;
         this.note = note;
+        this.noteName = getNoteName(note);
         this.playing = false;
     }
 
-    draw() {
+    draw(isHovered) {
         if (this.alive) {
             let lightness;
             this.playing ? lightness = 50 : lightness = 100;
             ctx.fillStyle = 'hsl(200, 60%, ' + lightness + '%)';
             ctx.fillRect(this.x, this.y, cellSize, cellSize);
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'white';
+            ctx.fillText(this.noteName, this.x + cellSize / 4, this.y + cellSize / 2);
             // synth.triggerAttackRelease("Bb3", "8n");
         }
         else {
-            ctx.fillStyle = 'hsl(0, 0%, 0%)';
-            ctx.fillRect(this.x, this.y, cellSize, cellSize);
+            if (isHovered) {
+                ctx.fillStyle = 'hsla(50, 50%, 50%, 50%';
+                ctx.fillRect(this.x, this.y, cellSize, cellSize);
+                ctx.font = '12px Arial';
+                ctx.fillStyle = 'white';
+                ctx.fillText(this.noteName, this.x + cellSize / 4, this.y + cellSize / 2);
+            }
+            else {
+                ctx.fillStyle = 'hsl(0, 0%, 0%)';
+                ctx.fillRect(this.x, this.y, cellSize, cellSize);
+            }
         }
-    }
 
+        ctx.strokeStyle = 'rgba(120, 120, 120, 0.5)';
+        ctx.strokeRect(this.x, this.y, cellSize, cellSize);
+    }
 }
 
 const wholeScale = [2, 2, 1, 2, 2, 2, 1];
+const diatonicThirds = [4, 3, 4, 3, 3, 4, 3];
+/*
 const altScale = [2, 2, 1, 2, 2, 3];
 const altInts = [4, 3, 5, 4, 3, 5];
-const diatonicThirds = [4, 3, 4, 3, 3, 4, 3];
-// C-Major Scale
-// To-do: Allow changing of root in UI
-// To-do: Allow for different types of scales
-const scaleRoot = 49;
+*/
+let scaleIdx = 0;
+// We base at G1 or 48.999 Hz
+const scaleRoot = 48.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
+function getNoteName(freq) {
+    const scale = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    let basePlusInterval = Math.log2(freq / scaleRoot) * 12;
+    let noteName = scale[Math.round(basePlusInterval) % 12];
+    let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 1;
+    return noteName + noteOct.toString();
+}
 
 function fillGrid() {
     let base = 0;
@@ -68,7 +93,7 @@ function fillGrid() {
         interval = 0;
         for (let x_i = 0; x_i < gridSize; x_i++) {
             let freq = scaleRoot * Math.pow(2, (base + interval) / 12);
-            let alive = (Math.random() <= 0.2);
+            let alive = false;
             grid.push(new Cell(x_i * cellSize, y_i * cellSize, alive, freq));
             interval += wholeScale[(x_i + (y_i * 2)) % 7];
             console.log(freq);
@@ -77,12 +102,25 @@ function fillGrid() {
     }
 }
 fillGrid();
+handleCells();
 
 function handleCells() {
     synth.triggerRelease(audioToPlay, Tone.now());
     updateMethod();
     for (let i = 0; i < grid.length; i++) {
-        grid[i].draw();
+        grid[i].draw(false);
+    }
+}
+
+function findRightMost() {
+    for (let y_i = 0; y_i < gridSize; y_i++) {
+        for (let x_i = gridSize - 1; x_i >= 0; x_i--) {
+            if (grid[(y_i * gridSize) + x_i].alive) {
+                audioToPlay.push(grid[(y_i * gridSize) + x_i].note);
+                grid[(y_i * gridSize) + x_i].playing = true;
+                x_i = -1;
+            }
+        }
     }
 }
 
@@ -139,15 +177,7 @@ function updateMethod() {
     for (let i = 0; i < grid.length; i++) {
         grid[i] = newGrid[i];
     }
-    for (let y_i = 0; y_i < gridSize; y_i++) {
-        for (let x_i = gridSize - 1; x_i >= 0; x_i--) {
-            if (grid[(y_i * gridSize) + x_i].alive) {
-                audioToPlay.push(grid[(y_i * gridSize) + x_i].note);
-                grid[(y_i * gridSize) + x_i].playing = true;
-                x_i = -1;
-            }
-        }
-    }
+    findRightMost();
     synth.triggerAttack(audioToPlay, Tone.now());
 }
 
@@ -164,6 +194,7 @@ function animate() {
 
 window.addEventListener('keydown', async(event) => {
     if (event.key === 'Enter') { 
+        paused = false;
         try {
             // Prompt the user to allow audio playback
             await Tone.start();
@@ -176,3 +207,36 @@ window.addEventListener('keydown', async(event) => {
     }
 });
 	
+function handleMouseHover(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
+    const cellIndex = row * gridSize + col;
+
+    for (let i = 0; i < grid.length; i++) {
+        const isHovered = i === cellIndex;
+        grid[i].draw(isHovered);
+    }
+}
+canvas.addEventListener('mousemove', handleMouseHover);
+
+function handleMouseClick(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
+    const cellIndex = row * gridSize + col;
+
+    for (let i = 0; i < grid.length; i++) {
+        console.log(i === cellIndex);
+        if (i === cellIndex) {
+            grid[i].alive = !grid[i].alive;
+            grid[i].draw();
+        }
+    }
+    findRightMost();
+}
+canvas.addEventListener('click', handleMouseClick);
