@@ -131,36 +131,32 @@ function updateMethod() {
         let numNeighborsAlive = 0;
         let alive = grid[i].alive;
         // Gather information on neighboring cells
-        const cellLeft = (i % gridSize) - 1 >= 0;
-        const cellRight = (i % gridSize) + 1 <= gridSize - 1;
-        const cellAbove = i - gridSize >= 0;
-        const cellBelow = i + gridSize < (gridSize * gridSize);
-        if (cellLeft) {
-            if (grid[i - 1].alive) numNeighborsAlive++;
-        }
-        if (cellRight) {
-            if (grid[i + 1].alive) numNeighborsAlive++;
-        }
-        if (cellAbove) {
-            if (grid[i - gridSize].alive) numNeighborsAlive++;
-            if (cellLeft) {
-                if (grid[i - gridSize - 1].alive) numNeighborsAlive++;
-            }
-            if (cellRight) {
-                if (grid[i - gridSize + 1].alive) numNeighborsAlive++;
-            }
-        }
-        if (cellBelow) {
-            if (grid[i + gridSize].alive)  {
-                numNeighborsAlive++;
-            }
-            if (cellLeft) {
-                if (grid[i + gridSize - 1].alive) numNeighborsAlive++;
-            }
-            if (cellRight) {
-                if (grid[i + gridSize + 1].alive) numNeighborsAlive++;
-            }
-        }
+        function leftIdx(idx) {
+            return (i % gridSize) - 1 >= 0 ? idx - 1 : idx - 1 + gridSize;
+        } 
+        function rightIdx(idx) {
+            return (i % gridSize) + 1 <= gridSize - 1 ? idx + 1 : idx + 1 - gridSize;
+        } 
+        const aboveIdx = (i - gridSize + (gridSize * gridSize)) % (gridSize * gridSize);
+        const belowIdx = (i + gridSize) % (gridSize * gridSize);
+
+        console.log([leftIdx(i), i, rightIdx(i), leftIdx(aboveIdx), aboveIdx, rightIdx(aboveIdx),
+            leftIdx(belowIdx), belowIdx, rightIdx(belowIdx)]);
+        
+        if (grid[aboveIdx].alive) numNeighborsAlive++;
+        if (grid[leftIdx(aboveIdx)].alive) numNeighborsAlive++;
+        if (grid[rightIdx(aboveIdx)].alive) numNeighborsAlive++;
+        
+        if (grid[leftIdx(i)].alive) numNeighborsAlive++;
+        if (grid[rightIdx(i)].alive) numNeighborsAlive++;
+
+        if (grid[belowIdx].alive) numNeighborsAlive++;
+        if (grid[leftIdx(belowIdx)].alive) numNeighborsAlive++;
+        if (grid[rightIdx(belowIdx)].alive) numNeighborsAlive++;
+
+        console.log(numNeighborsAlive);
+        
+        
         // We handle survival here
         if (alive && (numNeighborsAlive >= 2 && numNeighborsAlive <= 3)) {
             alive = true;
