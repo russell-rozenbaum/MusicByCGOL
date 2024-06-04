@@ -22,12 +22,33 @@ window.addEventListener('resize', function() {
 */
 
 let paused = true;
+let bpm = 88;
 const xLoc = 0;
 const yLoc = 0;
 const gridSize = 12;
 const cellSize = 42;
 let grid = [];
 let audioToPlay = [];
+
+const scaleInput = document.getElementById('scaleInput');
+const scaleValue = document.getElementById('scaleValue');
+let scaleIdx = Number(scaleInput.value);
+let scaleRoot = 97.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
+scaleInput.addEventListener('input', function() {
+    scaleIdx = Number(scaleInput.value);
+    scaleRoot = 97.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
+    fixGrid();
+});
+
+const tempoInput = document.getElementById('tempoInput');
+const tempoValue = document.getElementById('tempoValue');
+bpm = Number(tempoInput.value);
+tempoValue.textContent = tempoInput.value;
+tempoInput.addEventListener('input', function() {
+    bpm = Number(tempoInput.value);
+    tempoValue.textContent = tempoInput.value;
+});
+
 
 class Cell {
     constructor(x, y, alive, note) {
@@ -45,18 +66,18 @@ class Cell {
             this.playing ? lightness = 50 : lightness = 100;
             ctx.fillStyle = 'hsl(200, 60%, ' + lightness + '%)';
             ctx.fillRect(this.x, this.y, cellSize, cellSize);
-            ctx.font = '12px Arial';
+            ctx.font = '14px Arial';
             ctx.fillStyle = 'white';
-            ctx.fillText(this.noteName, this.x + cellSize / 4, this.y + cellSize / 2);
+            ctx.fillText(this.noteName, this.x + cellSize / 3.5, this.y + cellSize / 1.7);
             // synth.triggerAttackRelease("Bb3", "8n");
         }
         else {
             if (isHovered) {
                 ctx.fillStyle = 'hsla(50, 50%, 50%, 50%';
                 ctx.fillRect(this.x, this.y, cellSize, cellSize);
-                ctx.font = '12px Arial';
+                ctx.font = '14px Arial';
                 ctx.fillStyle = 'white';
-                ctx.fillText(this.noteName, this.x + cellSize / 4, this.y + cellSize / 2);
+                ctx.fillText(this.noteName, this.x + cellSize / 3.5, this.y + cellSize / 1.7);
             }
             else {
                 ctx.fillStyle = 'hsl(0, 0%, 0%)';
@@ -75,12 +96,9 @@ const diatonicThirds = [4, 3, 4, 3, 3, 4, 3];
 const altScale = [2, 2, 1, 2, 2, 3];
 const altInts = [4, 3, 5, 4, 3, 5];
 */
-let scaleIdx = 0;
-// We base at G1 or 48.999 Hz
-const scaleRoot = 97.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
 function getNoteName(freq) {
     const scale = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
-    let basePlusInterval = Math.log2(freq / scaleRoot) * 12;
+    let basePlusInterval = (Math.log2(freq / scaleRoot) * 12) + scaleIdx;
     let noteName = scale[Math.round(basePlusInterval) % 12];
     let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 1;
     return noteName + noteOct.toString();
@@ -96,13 +114,27 @@ function fillGrid() {
             let alive = false;
             grid.push(new Cell(x_i * cellSize, y_i * cellSize, alive, freq));
             interval += wholeScale[(x_i + (y_i * 2)) % 7];
-            console.log(freq);
         }
         base += diatonicThirds[y_i % 7];
     }
 }
 fillGrid();
 handleCells();
+
+function fixGrid() {
+    let base = 0;
+    let interval = 0;
+    for (let y_i = 0; y_i < gridSize; y_i++) {
+        interval = 0;
+        for (let x_i = 0; x_i < gridSize; x_i++) {
+            let freq = scaleRoot * Math.pow(2, (base + interval) / 12);
+            grid[(y_i * gridSize) + x_i].note = freq;
+            grid[(y_i * gridSize) + x_i].noteName = getNoteName(freq);
+            interval += wholeScale[(x_i + (y_i * 2)) % 7];
+        }
+        base += diatonicThirds[y_i % 7];
+    }
+}
 
 function handleCells() {
     synth.triggerRelease(audioToPlay, Tone.now());
@@ -139,9 +171,6 @@ function updateMethod() {
         } 
         const aboveIdx = (i - gridSize + (gridSize * gridSize)) % (gridSize * gridSize);
         const belowIdx = (i + gridSize) % (gridSize * gridSize);
-
-        console.log([leftIdx(i), i, rightIdx(i), leftIdx(aboveIdx), aboveIdx, rightIdx(aboveIdx),
-            leftIdx(belowIdx), belowIdx, rightIdx(belowIdx)]);
         
         if (grid[aboveIdx].alive) numNeighborsAlive++;
         if (grid[leftIdx(aboveIdx)].alive) numNeighborsAlive++;
@@ -153,9 +182,6 @@ function updateMethod() {
         if (grid[belowIdx].alive) numNeighborsAlive++;
         if (grid[leftIdx(belowIdx)].alive) numNeighborsAlive++;
         if (grid[rightIdx(belowIdx)].alive) numNeighborsAlive++;
-
-        console.log(numNeighborsAlive);
-        
         
         // We handle survival here
         if (alive && (numNeighborsAlive >= 2 && numNeighborsAlive <= 3)) {
@@ -185,7 +211,7 @@ function animate() {
     ctx.fillRect(xLoc,yLoc, gridSize * cellSize, gridSize * cellSize);
     handleCells();
     setTimeout(() => {
-        requestAnimationFrame(animate);}, 1000);
+        requestAnimationFrame(animate);}, (1 / bpm) * 60000); // Convert beat/min to ms/beat
 }
 
 window.addEventListener('keydown', async(event) => {

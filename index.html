@@ -18,13 +18,27 @@
         </nav>
         <div class="items">
             <div class="inputBox"> 
-                <!-- 
-                <label for="sliderInput">n/a<span id="sliderValue"></span></label>
-                <input type="range" id="sliderInput" min="1" max="81" value="67">
-                -->
                 <div>
                     Select cells to be alive, then press 'Enter' to begin
                 </div>
+                <p></p>
+                <label for="scaleInput">Scale</label>
+                <select id="scaleInput">
+                    <option value="0">C</option>
+                    <option value="1">Db</option>
+                    <option value="2">D</option>
+                    <option value="3">Eb</option>
+                    <option value="4">E</option>
+                    <option value="5">F</option>
+                    <option value="6">Gb</option>
+                    <option value="7">G</option>
+                    <option value="8">Ab</option>
+                    <option value="9">A</option>
+                    <option value="10">Bb</option>
+                    <option value="11">B</option>
+                </select>
+            <label for="tempoInput">BPM<span id="tempoValue"></span></label>
+            <input type="range" id="tempoInput" min="20" max="200" value="88">
             </div>    
             <canvas id="canvas1"></canvas>
             

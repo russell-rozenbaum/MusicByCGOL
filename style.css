@@ -69,14 +69,19 @@ nav a:hover {
     grid-template-columns: 1fr;
     grid-template-rows: 3fr;
     background: rgb(235, 235, 235);
-    padding: 20px;
+    padding: 50px;
     align-self: self-start;
     grid-column: 1;
 }
 
-#sliderInput {
+#scaleInput {
     width: 200px; 
-    margin-bottom: 20px;
+    margin: 20px;
+  }
+
+#tempoInput {
+    width: 200px; 
+    margin: 20px;
   }
 
 #survivalLBInput {
