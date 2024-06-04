@@ -58,8 +58,8 @@ nav a:hover {
 
 #canvas1 {
     background: rgb(237, 237, 237);
-    width: 504px;
-    height: 504px;
+    width: 576px;
+    height: 576px;
     grid-column: 2;
 }
 

@@ -11,8 +11,8 @@ synth.chain(filter, reverb, comp);
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 
-canvas.width = 504;
-canvas.height = 504;
+canvas.width = 576;
+canvas.height = 576;
 
 /*
 window.addEventListener('resize', function() {
@@ -25,18 +25,18 @@ let paused = true;
 let bpm = 88;
 const xLoc = 0;
 const yLoc = 0;
-const gridSize = 12;
-const cellSize = 42;
+const gridSize = 16;
+const cellSize = 36;
 let grid = [];
 let audioToPlay = [];
 
 const scaleInput = document.getElementById('scaleInput');
 const scaleValue = document.getElementById('scaleValue');
 let scaleIdx = Number(scaleInput.value);
-let scaleRoot = 65.4 * Math.pow(2, (scaleIdx / 12));
+let scaleRoot = 32.703 * Math.pow(2, (scaleIdx / 12));
 scaleInput.addEventListener('input', function() {
     scaleIdx = Number(scaleInput.value);
-    scaleRoot = 65.4 * Math.pow(2, (scaleIdx / 12));
+    scaleRoot = 32.703 * Math.pow(2, (scaleIdx / 12));
     fixGrid();
 });
 
@@ -100,7 +100,7 @@ function getNoteName(freq) {
     const scale = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let basePlusInterval = (Math.log2(freq / scaleRoot) * 12) + scaleIdx;
     let noteName = scale[Math.round(basePlusInterval) % 12];
-    let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 2;
+    let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 1;
     return noteName + noteOct.toString();
 }
 
