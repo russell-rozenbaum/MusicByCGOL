@@ -33,10 +33,10 @@ let audioToPlay = [];
 const scaleInput = document.getElementById('scaleInput');
 const scaleValue = document.getElementById('scaleValue');
 let scaleIdx = Number(scaleInput.value);
-let scaleRoot = 97.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
+let scaleRoot = 65.4 * Math.pow(2, (scaleIdx / 12));
 scaleInput.addEventListener('input', function() {
     scaleIdx = Number(scaleInput.value);
-    scaleRoot = 97.999 * Math.pow(2, (((scaleIdx + 5) % 12) / 12));
+    scaleRoot = 65.4 * Math.pow(2, (scaleIdx / 12));
     fixGrid();
 });
 
@@ -100,7 +100,7 @@ function getNoteName(freq) {
     const scale = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let basePlusInterval = (Math.log2(freq / scaleRoot) * 12) + scaleIdx;
     let noteName = scale[Math.round(basePlusInterval) % 12];
-    let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 1;
+    let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 2;
     return noteName + noteOct.toString();
 }
 
