@@ -44,10 +44,15 @@ const tempoInput = document.getElementById('tempoInput');
 const tempoValue = document.getElementById('tempoValue');
 bpm = Number(tempoInput.value);
 tempoValue.textContent = tempoInput.value;
+// This line solves issues of notes being dropped when maxPolyph is exceeded
+synth.maxPolyphony = 2 * gridSize * ((bpm - (bpm % 20)) / 20);
 tempoInput.addEventListener('input', function() {
     bpm = Number(tempoInput.value);
     tempoValue.textContent = tempoInput.value;
+    synth.maxPolyphony = 2 * gridSize * ((bpm - (bpm % 20)) / 20);
+    console.log(synth.maxPolyphony);
 });
+console.log(synth.maxPolyphony);
 
 
 class Cell {
@@ -90,12 +95,8 @@ class Cell {
     }
 }
 
-const wholeScale = [2, 2, 1, 2, 2, 2, 1];
-const diatonicThirds = [4, 3, 4, 3, 3, 4, 3];
-/*
-const altScale = [2, 2, 1, 2, 2, 3];
-const altInts = [4, 3, 5, 4, 3, 5];
-*/
+
+
 function getNoteName(freq) {
     const scale = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
     let basePlusInterval = (Math.log2(freq / scaleRoot) * 12) + scaleIdx;
@@ -103,7 +104,12 @@ function getNoteName(freq) {
     let noteOct = Math.floor(Math.round(basePlusInterval) / 12) + 1;
     return noteName + noteOct.toString();
 }
-
+const wholeScale = [2, 2, 1, 2, 2, 2, 1];
+const diatonicThirds = [4, 3, 4, 3, 3, 4, 3];
+/*
+const altScale = [2, 2, 1, 2, 2, 3];
+const altInts = [4, 3, 5, 4, 3, 5];
+*/
 function fillGrid() {
     let base = 0;
     let interval = 0;
@@ -120,7 +126,6 @@ function fillGrid() {
 }
 fillGrid();
 handleCells();
-
 function fixGrid() {
     let base = 0;
     let interval = 0;
@@ -135,6 +140,8 @@ function fixGrid() {
         base += diatonicThirds[y_i % 7];
     }
 }
+
+
 
 function handleCells() {
     synth.triggerRelease(audioToPlay, Tone.now());
